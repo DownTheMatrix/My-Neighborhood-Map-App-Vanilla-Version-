@@ -1,10 +1,14 @@
-import React, { Component } from 'react';
+/* Basic components */
+import React, { Component } from "react";
 import './App.css';
 
 /* Main app components */
 import { StaticLocations } from "./StaticLocations";
-import Header from "./Header";
+import Header from "./components/Header";
 import Map from "./components/Map";
+
+/* Import infowindows content */
+import { infoWindowContent, infoWindowError } from "./InfoWindows";
 
 /* Map custom sheet */
 import MapStyles from "./MapStyles.json";
@@ -18,9 +22,10 @@ import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 
 /* Define global variables */
-let markers = [];
-let infoWindows = [];
+/* let markers = [];
+let infoWindows = []; */
 let map;
+let fetchData = null;
 
 class App extends Component {
   constructor(props) {
@@ -31,6 +36,8 @@ class App extends Component {
       filterQuery: "",
       mapInitialization: true,
       data: [],
+      markers: [],  // new!!!
+      infoWindows: []  // new!!!
     };
   }
 
@@ -44,7 +51,7 @@ class App extends Component {
     };
     map = new window.google.maps.Map(document.getElementById( "map" ), mapOptions);
     /* this.setState({ map: map }); */
-    this.renderMarkers()
+    this.renderMarkers();
   }
 
   /* Display error messages if the map initialization fails */
@@ -58,6 +65,7 @@ class App extends Component {
       if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
         if (isScriptLoadSucceed) {
           this.initMap();
+          this.fetchVenues();
         } else {
           this.initError();
         }
@@ -65,15 +73,22 @@ class App extends Component {
     }
 
   /* Retrieve the static locations info from the StaticLocations file and render the markers on the map */
-  renderMarkers() {   
+  renderMarkers() {  // src: https://developers.google.com/maps/documentation/javascript/markers
     const { locations } = this.state;
     locations.map(( location ) => {
-      const marker = new window.google.maps.Marker({
-        position: { lat: location.locationCoords.lat, lng: location.locationCoords.lng  },
+      let marker = new window.google.maps.Marker({
+        position: { lat: location.locationCoords.lat, lng: location.locationCoords.lng },
         map: map,
-        title: location.locationName
+        title: location.locationName,
+        animation: window.google.maps.Animation.DROP
       });
     });
+  }
+
+  /* Create the markers infowindows, src: https://developers.google.com/maps/documentation/javascript/infowindows */
+  createInfoWindow( marker, infoWindow ) {
+    fetchData ? infoWindow.setContent : infoWindow.setContent;
+    infoWindow.open( map, marker );
   }
 
   /* Called immediately after the component has been updated */
@@ -86,11 +101,33 @@ class App extends Component {
     console.log("Component did mount!");
   }
 
+  /* Fetch venues from FourSquare */
+  fetchVenues() {
+    let foundVenues = [];
+    StaticLocations.map(( location ) => {
+      fetch(`https://api.foursquare.com/v2/venues/${ location.locationId }` +
+      `?client_id=${ CLIENT_ID }` +
+      `&client_secret=${ CLIENT_SECRET }` +
+      `&v=20180101&locale=en`)
+      .then( response  => response.json())
+      .then( data => {
+        if ( data.meta.code === 200) {  // Check if the request code returns success status
+          foundVenues.push( data.response.venue )
+        }
+      }).catch( err => {
+        fetchData = false;
+        console.log("The fetch attempt failed. Error: ", err);
+      });
+    });
+    this.setState({ markers: foundVenues });
+    console.log(this.state.markers);
+  }
+
   render() {
 
     return (
 
-      <div className="map-container">
+      <div className="map-container" role="main">
 
         {/* Header component */}
         <Header />
