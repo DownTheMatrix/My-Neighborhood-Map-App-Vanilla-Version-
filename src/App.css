@@ -1,7 +1,29 @@
+/* General style */
+html, body {
+  margin: 0;
+  padding: 0;
+ 
+  width: 100%;
+}
+
+#app-container {
+  margin: 0;
+  padding: 0;
+}
+
+/* Error field */
+#display-error-field {
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+  border: 1px dashed red;
+  display: none;
+}
+
 /* Header */
 #header {
   width: 100%;
-  height: 15vh;
+  height: 10vh;
   text-align: center;
   background-color: #882900;
   color: #fff;
@@ -24,6 +46,69 @@ font-size: 1.5em;
 
 /* Map style */
 #map {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 70vw;
+}
+
+/* Main */
+.main-map {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Map container */
+.map-container {
+  background-color: #343434;
+  height: 90vh;
+}
+
+/* Filter locations menu */
+#list-aside {
+  margin: 0;
+  padding: 0;
+  line-height: 1.7;
+  list-style-type: none;
+}
+
+#list-aside li {
+  color: #f2f2f2;
+  padding: 1em;
+  border-bottom: 1px solid lightblue;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.hamburger-button {
+  background-color: lightblue;
+  position: absolute;
+  align-self: flex-start;
+  z-index: 1000;
+  padding: 0.8em;
+  border: 2px solid darkblue;
+  cursor: pointer;
+  top: calc(100% - 75px);
+  left: 10px;
+  border-radius: 15%;
+}
+
+.hamburger-show {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 30%;
+  min-width: 250px;
+  background: #16222A;  /* Credit: https://uigradients.com/#Mirage */
+  background: -webkit-linear-gradient(to right, #3A6073, #16222A);  
+  background: linear-gradient(to right, #3A6073, #16222A);  
+  transition: all 800ms ease-in-out;
+}
+
+.hamburger-hide {
+  width: 0px;
+  min-width: 0;
+  transition: all 800ms ease-in-out;
+  background: #16222A;  /* Credit: https://uigradients.com/#Mirage */
+  background: -webkit-linear-gradient(to right, #3A6073, #16222A);  
+  background: linear-gradient(to right, #3A6073, #16222A);  
 }
