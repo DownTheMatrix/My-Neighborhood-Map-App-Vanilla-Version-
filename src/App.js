@@ -8,7 +8,7 @@ import Header from "./components/Header";
 import Map from "./components/Map";
 
 /* Import infowindows content */
-import { infoWindowContent, infoWindowError } from "./InfoWindows";
+/* import { infoWindowContent, infoWindowError } from "./InfoWindows"; */
 
 /* Map custom sheet */
 import MapStyles from "./MapStyles.json";
@@ -22,11 +22,8 @@ import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 
 /* Define global variables */
-/* let markers = [];
-let infoWindows = []; */
-let map;
-let fetchData = null;
-let buildMap = {}
+let map;  // Define map variable to use in the initMap() function
+let markers = [];
 
 class App extends Component {
   constructor(props) {
@@ -37,23 +34,61 @@ class App extends Component {
       filterQuery: "",
       mapInitialization: true,
       data: [],
+      venuesList: [],
+      foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
-      markers: [],  // new!!!
-      infoWindows: []  // new!!!
     };
   }
 
-  /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers */
+  /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers && https://stackoverflow.com/questions/3059044/google-maps-js-api-v3-simple-multiple-marker-example */
   initMap() {
-    let myLatlng = new window.google.maps.LatLng( 45.438384, 10.991622 );
+    const initialCenter = new window.google.maps.LatLng( 45.438384, 10.991622 );
     let mapOptions = {
       zoom: 14,
-      center:  myLatlng,
-      styles: MapStyles
+      center:  initialCenter,
+      styles: MapStyles,
+      mapTypeId: window.google.maps.MapTypeId.ROADMAP
     };
+    /* Create map */
     map = new window.google.maps.Map(document.getElementById( "map" ), mapOptions);
-    this.setState({ map: map });
-    this.renderMarkers();
+    /* Create infowindow */
+    const largeInfoWindow = new window.google.maps.InfoWindow();
+    const bounds = new window.google.maps.LatLngBounds();
+    /* Loop through the locations array and create a marker for each coordinates */
+    const { locations } = this.state;
+    for (let i = 0; i < locations.length; i++) {
+      const position = locations[i].locationCoords;
+      const locationTitle = locations[i].locationName;
+      const marker = new window.google.maps.Marker({
+        map: map,
+        position: position,
+        title: locationTitle,
+        animation: window.google.maps.Animation.DROP,
+        id: i
+      });
+      /* Push the newly created markers to the markers array */
+      markers.push( marker );
+      /* Listen for a click event to open the corresponding infowindow */
+      marker.addListener("click", () => {
+        this.populateInfoWindow( marker, largeInfoWindow );
+      });
+      /* Extend the map boundaries to include the markers */
+      bounds.extend( markers[i].position );
+    }   
+    // Extend the boundaries of the map for each marker
+    map.fitBounds (bounds );
+  }
+
+  /* Create infowindow content and link it to the corresponding marker */
+  populateInfoWindow( marker, infowindow ) {
+    if ( infowindow.marker !== marker ) {
+      infowindow.marker = marker;
+      infowindow.setContent( '<div>' + marker.title +'</div>' );
+      infowindow.open( map, marker );
+      infowindow.addListener( "closeclick", () => {
+      infowindow.setMarker( null );
+      });
+    }
   }
 
   /* Display error messages if the map initialization fails */
@@ -67,7 +102,6 @@ class App extends Component {
     if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
       if (isScriptLoadSucceed) {
         this.initMap();
-        /* this.fetchVenues(); */  // API call to FourSquare
       } else {
         this.initError();
       }
@@ -75,7 +109,7 @@ class App extends Component {
   }
 
   /* Retrieve the static locations info from the StaticLocations file and render the markers on the map */
-  renderMarkers() {  // src: https://developers.google.com/maps/documentation/javascript/markers
+/*   renderMarkers () {  // src: https://developers.google.com/maps/documentation/javascript/markers
     const { locations } = this.state;
     locations.map(( location ) => {
       const marker = new window.google.maps.Marker({
@@ -85,7 +119,7 @@ class App extends Component {
         animation: window.google.maps.Animation.DROP
       });
     });
-  }
+  } */
 
   /* Create the markers infowindows, src: https://developers.google.com/maps/documentation/javascript/infowindows */
   createInfoWindow( marker, infoWindow ) {
@@ -94,7 +128,7 @@ class App extends Component {
 
   /* Called immediately after the component has been updated */
   componentDidUpdate() {
-
+    
   }
 
   /* Src: https://www.npmjs.com/package/react-async-script-loader */
@@ -103,10 +137,11 @@ class App extends Component {
     if ( window.screen.width > 500 ) {  // Toggle automatically hamburger menu if screen size is greater than...
       this.setState({ hamburgerToggled: true }); 
     }
+   /*  this.fetchVenues(); */   // API call to FourSquare
   }
 
    /* Toggle the hamburger menu function */
-   toggleHamburgerMenu = () => {
+   toggleHamburgerMenu () {
     if (this.state.hamburgerToggled) {
       this.setState({ hamburgerToggled: false });
     } else {
@@ -115,43 +150,48 @@ class App extends Component {
   }
 
   /* Fetch venues from FourSquare */
-  fetchVenues() {
-    let foundVenues = [];
-    StaticLocations.map(( location ) => {
-      fetch(`https://api.foursquare.com/v2/venues/${ location.locationId }` +
-      `?client_id=${ CLIENT_ID }` +
-      `&client_secret=${ CLIENT_SECRET }` +
-      `&v=20180101&locale=en`)
-      .then( response  => response.json())
-      .then( data => {
-        if ( data.meta.code === 200) {  // Check if the request code returns success status
-          foundVenues.push( data.response.venue )
-        }
-      }).catch( err => {
-        fetchData = false;
-        console.log("The fetch attempt failed. Error: ", err);
-      });
-    });
-    this.setState({ markers: foundVenues });
-    console.log(this.state.markers);
+   /* Fetch data from FourSquare API */
+   fetchVenues = () => {
+    fetch(`https://api.foursquare.com/v2/venues/search?near=Verona&query=restaurant&category=4bf58dd8d48988d12d941735&limit=5&radius=5000&intent=browse&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&v=20180101&locale=en`)
+    .then ( res => res.json() )
+    .then( data => {
+      const venuesList = data.response.venues;
+      if ( venuesList.length === 0 ) {  // Check if the data returned some results
+        window.alert("Error! No available places. Try to refresh the page!");  // To delete after refactor
+      }
+      venuesList.sort( sortBy( "name" ) );  // Use "sort-by" package functionality to arrange venues alphabetically
+      const foundVenues = venuesList;
+      this.setState({ 
+        venuesList: venuesList, 
+        foundVenues: foundVenues
+      }) 
+      console.log("venuesList :", venuesList);
+      console.log("foundVenues :", foundVenues);
+    })
+    .catch( err => {  // Notify the user about the error type
+      const showError = document.querySelector("#display-error-field");
+      showError.innerHTML = "Sorry, we couldn't retrieve data correctly. Try to reload the page.";
+      console.error("Sorry, we couldn't retrieve data properly. An error occurred with the FourSquare API", err)
+    })
   }
 
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled } = this.state;
+    const { hamburgerToggled, foundVenues } = this.state;
 
     return (
 
-      <div className="app-container" role="main">
+      <div id="app-container" role="main">
+        <div id="display-error-field"></div>
 
-        {/* Header component */}
-        <Header />
-
+         {/* Header component */}
+         <Header />
+ 
         {/* Side menu */}
         <main className="main-map">
           <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }>
-          
+
             <div id="list-wrapper">
             <ul id="list-aside">
               <li>list-item</li>
