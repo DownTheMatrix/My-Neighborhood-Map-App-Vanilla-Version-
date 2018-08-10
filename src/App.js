@@ -26,6 +26,7 @@ import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 let infoWindows = []; */
 let map;
 let fetchData = null;
+let buildMap = {}
 
 class App extends Component {
   constructor(props) {
@@ -51,7 +52,7 @@ class App extends Component {
       styles: MapStyles
     };
     map = new window.google.maps.Map(document.getElementById( "map" ), mapOptions);
-    /* this.setState({ map: map }); */
+    this.setState({ map: map });
     this.renderMarkers();
   }
 
@@ -66,7 +67,7 @@ class App extends Component {
     if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
       if (isScriptLoadSucceed) {
         this.initMap();
-        /* this.fetchVenues(); */
+        /* this.fetchVenues(); */  // API call to FourSquare
       } else {
         this.initError();
       }
@@ -77,19 +78,13 @@ class App extends Component {
   renderMarkers() {  // src: https://developers.google.com/maps/documentation/javascript/markers
     const { locations } = this.state;
     locations.map(( location ) => {
-      let marker = new window.google.maps.Marker({
+      const marker = new window.google.maps.Marker({
         position: { lat: location.locationCoords.lat, lng: location.locationCoords.lng },
         map: map,
         title: location.locationName,
         animation: window.google.maps.Animation.DROP
       });
     });
-  }
-
-  /* Instantiate the infowindow object */
-  instantiateInfoWindow() {
-    let infoWindow = new window.google.maps.infoWindow({});
-    let bounds = new window.google.maps.LatLngBounds();
   }
 
   /* Create the markers infowindows, src: https://developers.google.com/maps/documentation/javascript/infowindows */
@@ -153,12 +148,22 @@ class App extends Component {
         {/* Header component */}
         <Header />
 
-        <main className="main-map">
-          <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }></aside>
-
         {/* Side menu */}
-        
-        
+        <main className="main-map">
+          <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }>
+          
+            <div id="list-wrapper">
+            <ul id="list-aside">
+              <li>list-item</li>
+              <li>list-item</li>
+              <li>list-item</li>
+              <li>list-item</li>
+              <li>list-item</li>
+            </ul>
+            </div>
+
+          </aside>
+       
         {/* Map component */}
         <section className="map-container">
           <Map />
