@@ -36,6 +36,7 @@ class App extends Component {
       filterQuery: "",
       mapInitialization: true,
       data: [],
+      hamburgerToggled: false,  // Set initial hamburger menu state
       markers: [],  // new!!!
       infoWindows: []  // new!!!
     };
@@ -60,17 +61,17 @@ class App extends Component {
     this.setState({ mapInitialization: false });
   }
 
-    /* Lazy loading of the script needed for the scriptLoader decorator, src: https://www.npmjs.com/package/react-async-script-loader  */
-    componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
-      if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
-        if (isScriptLoadSucceed) {
-          this.initMap();
-          this.fetchVenues();
-        } else {
-          this.initError();
-        }
+  /* Lazy loading of the script needed for the scriptLoader decorator, src: https://www.npmjs.com/package/react-async-script-loader  */
+  componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
+    if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
+      if (isScriptLoadSucceed) {
+        this.initMap();
+        /* this.fetchVenues(); */
+      } else {
+        this.initError();
       }
     }
+  }
 
   /* Retrieve the static locations info from the StaticLocations file and render the markers on the map */
   renderMarkers() {  // src: https://developers.google.com/maps/documentation/javascript/markers
@@ -85,10 +86,15 @@ class App extends Component {
     });
   }
 
+  /* Instantiate the infowindow object */
+  instantiateInfoWindow() {
+    let infoWindow = new window.google.maps.infoWindow({});
+    let bounds = new window.google.maps.LatLngBounds();
+  }
+
   /* Create the markers infowindows, src: https://developers.google.com/maps/documentation/javascript/infowindows */
   createInfoWindow( marker, infoWindow ) {
-    fetchData ? infoWindow.setContent : infoWindow.setContent;
-    infoWindow.open( map, marker );
+    
   }
 
   /* Called immediately after the component has been updated */
@@ -99,6 +105,18 @@ class App extends Component {
   /* Src: https://www.npmjs.com/package/react-async-script-loader */
   componentDidMount () {
     console.log("Component did mount!");
+    if ( window.screen.width > 500 ) {  // Toggle automatically hamburger menu if screen size is greater than...
+      this.setState({ hamburgerToggled: true }); 
+    }
+  }
+
+   /* Toggle the hamburger menu function */
+   toggleHamburgerMenu = () => {
+    if (this.state.hamburgerToggled) {
+      this.setState({ hamburgerToggled: false });
+    } else {
+      this.setState({ hamburgerToggled: true });
+    }
   }
 
   /* Fetch venues from FourSquare */
@@ -125,22 +143,32 @@ class App extends Component {
 
   render() {
 
+    /* Destructure state variables for readability */
+    const { hamburgerToggled } = this.state;
+
     return (
 
-      <div className="map-container" role="main">
+      <div className="app-container" role="main">
 
         {/* Header component */}
         <Header />
 
+        <main className="main-map">
+          <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }></aside>
+
+        {/* Side menu */}
+        
+        
         {/* Map component */}
-        <Map />
-
+        <section className="map-container">
+          <Map />
+        </section>
+        </main>
       </div>
-
     );
   }
 }
 
 export default scriptLoader(
-  [`https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places&sensor=true`]
+  [`https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places`]
 )(App);
