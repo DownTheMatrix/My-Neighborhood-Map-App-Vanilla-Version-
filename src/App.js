@@ -49,13 +49,22 @@ class App extends Component {
       styles: MapStyles,
       mapTypeId: window.google.maps.MapTypeId.ROADMAP
     };
+
     /* Create map */
     map = new window.google.maps.Map(document.getElementById( "map" ), mapOptions);
+
     /* Create infowindow */
     const largeInfoWindow = new window.google.maps.InfoWindow();
+
+    /* Create map boundaries */
     const bounds = new window.google.maps.LatLngBounds();
+
+    const { locations } = this.state;  // Destructure for readability
+
+    /* Create custom markers icons */
+    /* const markerIcon = ""; */
+
     /* Loop through the locations array and create a marker for each coordinates */
-    const { locations } = this.state;
     for (let i = 0; i < locations.length; i++) {
       const position = locations[i].locationCoords;
       const locationTitle = locations[i].locationName;
@@ -66,12 +75,15 @@ class App extends Component {
         animation: window.google.maps.Animation.DROP,
         id: i
       });
+
       /* Push the newly created markers to the markers array */
       markers.push( marker );
+
       /* Listen for a click event to open the corresponding infowindow */
       marker.addListener("click", () => {
         this.populateInfoWindow( marker, largeInfoWindow );
       });
+
       /* Extend the map boundaries to include the markers */
       bounds.extend( markers[i].position );
     }   
@@ -81,13 +93,17 @@ class App extends Component {
 
   /* Create infowindow content and link it to the corresponding marker */
   populateInfoWindow( marker, infowindow ) {
+    let infoWindowContent = `<div id="info-window">
+                                <h3>${marker.title}</h3>
+                                <p>Description here</p>
+                             </div>`;
     if ( infowindow.marker !== marker ) {
       infowindow.marker = marker;
-      infowindow.setContent( '<div>' + marker.title +'</div>' );
+      infowindow.setContent( infoWindowContent );
       infowindow.open( map, marker );
-      infowindow.addListener( "closeclick", () => {
+    /*   infowindow.addListener( "closeclick", () => {
       infowindow.setMarker( null );
-      });
+      }); */
     }
   }
 
@@ -178,11 +194,13 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, foundVenues } = this.state;
+    const { hamburgerToggled, foundVenues, locations } = this.state;
 
     return (
 
       <div id="app-container" role="main">
+
+        {/* Display an error message if there was a probolem with the API call */}
         <div id="display-error-field"></div>
 
          {/* Header component */}
@@ -193,21 +211,26 @@ class App extends Component {
           <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }>
 
             <div id="list-wrapper">
-            <ul id="list-aside">
-              <li>list-item</li>
-              <li>list-item</li>
-              <li>list-item</li>
-              <li>list-item</li>
-              <li>list-item</li>
-            </ul>
-            </div>
 
+              <ul id="list-aside">
+                {locations.map(( location, index ) => {
+                  return (
+                  <li 
+                    key = { index }
+                    onClick = {() => alert("clicked!")}
+                    >{ location.locationName }</li>
+                  );
+                })};
+              </ul>
+            
+            </div>
           </aside>
        
         {/* Map component */}
         <section className="map-container">
           <Map />
         </section>
+        
         </main>
       </div>
     );
