@@ -6,12 +6,13 @@ import './App.css';
 import { StaticLocations } from "./StaticLocations";
 import Header from "./components/Header";
 import Map from "./components/Map";
+import FilterLocations from "./components/FilterLocations";
 
 /* Import infowindows content */
 /* import { infoWindowContent, infoWindowError } from "./InfoWindows"; */
 
 /* Map custom sheet */
-import MapStyles from "./MapStyles.json";
+import MapStyles from "./data/MapStyles.json";
 
 /* Import API info */
 import { CLIENT_ID, CLIENT_SECRET } from "./utils/FourSquareAPI";
@@ -26,9 +27,7 @@ let map;  // Define map variable to use in the initMap() function
 let markers = [];
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+    state = {
       locations: StaticLocations,
       map: {},
       filterQuery: "",
@@ -38,7 +37,6 @@ class App extends Component {
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
     };
-  }
 
   /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers && https://stackoverflow.com/questions/3059044/google-maps-js-api-v3-simple-multiple-marker-example */
   initMap() {
@@ -60,9 +58,6 @@ class App extends Component {
     const bounds = new window.google.maps.LatLngBounds();
 
     const { locations } = this.state;  // Destructure for readability
-
-    /* Create custom markers icons */
-    /* const markerIcon = ""; */
 
     /* Loop through the locations array and create a marker for each coordinates */
     for (let i = 0; i < locations.length; i++) {
@@ -107,7 +102,7 @@ class App extends Component {
     }
   }
 
-  /* Display error messages if the map initialization fails */
+  /* Display an error message if the map initialization function fails */
   initError( err ) {
     console.log("Can't load the map properly. Error type: ", err);
     this.setState({ mapInitialization: false });
@@ -115,8 +110,8 @@ class App extends Component {
 
   /* Lazy loading of the script needed for the scriptLoader decorator, src: https://www.npmjs.com/package/react-async-script-loader  */
   componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
-    if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
-      if (isScriptLoadSucceed) {
+    if ( isScriptLoaded && !this.props.isScriptLoaded ) { // load finished
+      if ( isScriptLoadSucceed ) {
         this.initMap();
       } else {
         this.initError();
@@ -206,11 +201,15 @@ class App extends Component {
          {/* Header component */}
          <Header />
  
-        {/* Side menu */}
         <main className="main-map">
+
+          {/* Side menu */} 
           <aside className = { hamburgerToggled ? "hamburger-show" : "hamburger-hide" }>
 
             <div id="list-wrapper">
+
+              {/* Input field */}
+              <FilterLocations />
 
               <ul id="list-aside">
                 {locations.map(( location, index ) => {
@@ -222,7 +221,6 @@ class App extends Component {
                   );
                 })};
               </ul>
-            
             </div>
           </aside>
        
