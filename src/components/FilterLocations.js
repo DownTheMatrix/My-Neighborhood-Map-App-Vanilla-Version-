@@ -28,6 +28,7 @@ function FilterLocations ( props ) {
                     type = "text"
                     placeholder = { "Search for your venue" }
                     inputProps = {{ "aria-label" : "Query" }}
+                    onChange = { props.onChange }
                 />
             </form>
         </div>
