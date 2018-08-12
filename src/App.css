@@ -88,16 +88,17 @@ html, body {
 } 
 
 .hamburger-button {
-  background-color: lightblue;
+  background-color: #ad381b;
   position: absolute;
   align-self: flex-start;
   z-index: 1000;
   padding: 0.8em;
-  border: 2px solid darkblue;
+  border: 2px solid rgb(179, 49, 2);
   cursor: pointer;
   top: calc(100% - 80%);
   left: 10px;
   border-radius: 15%;
+  color: #fff;
 }
 
 .hamburger-show {
@@ -125,4 +126,17 @@ html, body {
 /* Map objects style */
 #info-window {
   text-align: center;
+}
+
+/* Media queries */
+@media screen and ( max-width: 360px ) {
+  #header h1 {
+    font-size: 16px;
+  }
+  .hamburger-show {
+    min-width: 200px;
+  }
+  .hamburger-button {
+    padding: 0.5em;
+  }
 }
