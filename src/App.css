@@ -93,7 +93,6 @@ html, body {
   align-self: flex-start;
   z-index: 1000;
   padding: 0.8em;
-  border: 2px solid rgb(179, 49, 2);
   cursor: pointer;
   top: calc(100% - 80%);
   left: 10px;
