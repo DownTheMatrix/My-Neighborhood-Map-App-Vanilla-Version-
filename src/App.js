@@ -193,6 +193,26 @@ class App extends Component {
     });
   }
 
+  /* handleInputChange function for filtering */
+  handleInputChange = (e) => {
+    this.setState({
+      filterQuery: e.target.value,
+    })
+    console.log(this.state.filterQuery)
+  }
+
+   /* Search for specific places */
+   searchVenues = ( filterQuery ) => {
+    let foundVenues;
+    const { venuesList } = this.state;
+    if ( filterQuery ) {
+      const match = new RegExp(escapeRegExp( filterQuery ), 'i');  // src: Udacity "React Contacts List" mini-course
+      return foundVenues = venuesList.filter(( venue ) => { match.test( venue.name )});
+    } else {
+      return foundVenues = venuesList;
+    }
+  }
+
   /* Fetch venues from FourSquare */
    /* Fetch data from FourSquare API */
    fetchVenues = () => {
@@ -244,7 +264,8 @@ class App extends Component {
 
               {/* Input component */}
               <FilterLocations 
-              />
+                onSearch = { this.searchVenues } 
+                onChange = { this.handleInputChange } />
 
               <ul id="list-aside">
                 { locations.map(( location, index ) => {
@@ -265,7 +286,8 @@ class App extends Component {
           <Map 
             google = { this.props.google } 
             className = { "map-component" }
-            role = "application" />
+            role = "application" 
+           />
         </section>
         
         </main>
