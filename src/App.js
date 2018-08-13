@@ -36,15 +36,22 @@ class App extends Component {
       locations: StaticLocations,
       map: {},
       filterQuery: "",
+      filteredLocations: [],
       mapInitialization: true,
       infowindowOpen: false,
+      markerAnimation: false,
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
     };
 
   /* Account for auth failure */
-
+  gm_authFailure = ( err ) => { 
+    const showError = document.querySelector("#display-error-field");
+    showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
+    console.error("Sorry, the map can be used in development only", err)
+  };
+  
   /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers && https://stackoverflow.com/questions/3059044/google-maps-js-api-v3-simple-multiple-marker-example */
   initMap = () => {
     const initialCenter = new window.google.maps.LatLng( 45.438384, 10.991622 );
@@ -99,6 +106,7 @@ class App extends Component {
       /* Listen for a click event to open the corresponding infowindow */
       newMarker.addListener("click", () => {
         this.populateInfoWindow( newMarker, largeInfoWindow );
+        this.animateMarkers( newMarker );
       });
 
       /* Close infowindow when the map is clicked on */
@@ -125,6 +133,17 @@ class App extends Component {
     /*   infowindow.addListener( "closeclick", () => {
       infowindow.setMarker( null );
       }); */
+    }
+  }
+
+  /* Animate markers on click */
+  animateMarkers = ( marker ) => {
+    if ( !this.state.markerAnimation ) {
+      marker.setAnimation( window.google.maps.Animation.BOUNCE );
+      this.setState({ markerAnimation: true });
+    } else {
+      marker.setAnimation( null );
+      this.setState({ markerAnimation: false });
     }
   }
 
@@ -250,7 +269,7 @@ class App extends Component {
 
         {/* Display an error message if there was a probolem with the API call */}
         <div id="display-error-field"></div>
-
+         
          {/* Header component */}
          <Header 
           onClick = { this.toggleHamburgerMenu }/>
@@ -292,6 +311,7 @@ class App extends Component {
         
         </main>
       </div>
+      
     );
   }
 }
