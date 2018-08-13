@@ -81,6 +81,11 @@ html, body {
   max-width: 100%;
 }
 
+li:active, li:focus {
+  border: 1px solid lightblue;
+  border-radius: 5%;
+}
+
 .btn {
   padding: 1em;
   border: 1px solid lightblue;
