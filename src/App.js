@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import './App.css';
 
 /* Main app components */
-import { StaticLocations } from "./StaticLocations";
+import { StaticLocations } from "./data/StaticLocations";
 import Header from "./components/Header";
 import Map from "./components/Map";
 import FilterLocations from "./components/FilterLocations";
@@ -54,7 +54,7 @@ class App extends Component {
   /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers && https://stackoverflow.com/questions/3059044/google-maps-js-api-v3-simple-multiple-marker-example */
   initMap = () => {
     const initialCenter = new window.google.maps.LatLng( 45.438384, 10.991622 );
-    let mapOptions = {
+    const mapOptions = {
       zoom: 14,
       center:  initialCenter,
       styles: MapStyles,
@@ -102,20 +102,41 @@ class App extends Component {
       /* Push the newly created markers to the markers array */
       markers.push( newMarker );
 
-      /* Listen for a click event to open the corresponding infowindow */
+      /* testing........ */
+     /*  window.google.maps.event.addListener(newMarker, "click", (( marker, i ) => {
+        return () => {
+            largeInfoWindow.setContent( locations[i][0] );
+            largeInfoWindow.open( map, marker );
+        }
+      })( newMarker, i )); */
+
+      /* Listen for a click event to open the corresponding infowindow and animate the markers */
       newMarker.addListener("click", () => {
         this.animateMarkers( newMarker );
         this.populateInfoWindow( newMarker, largeInfoWindow );
       });
+
+      /* initialize the focusMarker function */
+      this.focusMarker( newMarker, largeInfoWindow );
 
       /* Close infowindow when the map is clicked on */
       this.onMapClicked ( largeInfoWindow );
     
       /* Extend the map boundaries to include the markers */
       bounds.extend( markers[i].position );
-    }   
+    }
     // Extend the boundaries of the map for each marker
     map.fitBounds (bounds );
+  }
+
+  /* Focus on specific marker */
+  focusMarker = ( marker, infowindow ) => {
+    const { locations } = this.state;
+    for ( let i = 0; i < locations.length; i++ ) {
+      const position = locations[i].locationCoords;
+      map.setCenter(new window.google.maps.LatLng( position.lat, position.lng ));
+    }
+    /* window.google.maps.event.trigger(markers[id], 'click'); */
   }
 
   /* Create infowindow content and link it to the corresponding marker */
@@ -137,10 +158,10 @@ class App extends Component {
 
   /* Animate markers on click */
   animateMarkers = ( marker ) => {
-   marker.setAnimation( window.google.maps.Animation.BOUNCE );
-   setInterval( () => {
-    marker.setAnimation( null );
-   }, 1200 );
+    marker.setAnimation( window.google.maps.Animation.BOUNCE );
+    setInterval( () => {
+      marker.setAnimation( null );
+    }, 1200 );
   }
 
   /* Display an error message if the map initialization function fails */
@@ -154,6 +175,7 @@ class App extends Component {
     if ( isScriptLoaded && !this.props.isScriptLoaded ) { // load finished
       if ( isScriptLoadSucceed ) {
         this.initMap();
+        console.log(markers);
       } else {
         this.initError();
       }
@@ -288,7 +310,7 @@ class App extends Component {
                   <li 
                     role = "button"
                     key = { index }
-                    onClick = { () => alert( "clicked on " + location.locationName ) }
+                    onClick = { this.focusMarker.bind(this) }
                     >{ location.locationName }</li>
                   );
                 })};
