@@ -39,7 +39,6 @@ class App extends Component {
       filteredLocations: [],
       mapInitialization: true,
       infowindowOpen: false,
-      markerAnimation: false,
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
@@ -105,8 +104,8 @@ class App extends Component {
 
       /* Listen for a click event to open the corresponding infowindow */
       newMarker.addListener("click", () => {
-        this.populateInfoWindow( newMarker, largeInfoWindow );
         this.animateMarkers( newMarker );
+        this.populateInfoWindow( newMarker, largeInfoWindow );
       });
 
       /* Close infowindow when the map is clicked on */
@@ -138,13 +137,10 @@ class App extends Component {
 
   /* Animate markers on click */
   animateMarkers = ( marker ) => {
-    if ( !this.state.markerAnimation ) {
-      marker.setAnimation( window.google.maps.Animation.BOUNCE );
-      this.setState({ markerAnimation: true });
-    } else {
-      marker.setAnimation( null );
-      this.setState({ markerAnimation: false });
-    }
+   marker.setAnimation( window.google.maps.Animation.BOUNCE );
+   setInterval( () => {
+    marker.setAnimation( null );
+   }, 1200 );
   }
 
   /* Display an error message if the map initialization function fails */
