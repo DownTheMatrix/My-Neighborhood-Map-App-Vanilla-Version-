@@ -9,7 +9,7 @@ let map;
 
 class Map extends Component {
     constructor(props) {
-        super(props)
+        super( props )
         this.markers = [];
         this.infoWindow = null;
     };
@@ -23,6 +23,8 @@ class Map extends Component {
 
     /* Display an error message if the map initialization function fails */
     initError = ( err ) => {
+        const showError = document.querySelector("#display-error-field");
+        showError.innerHTML = "Can't load the map properly. Check the console for more details about the error.";
         console.log("Can't load the map properly. Error type: ", err);
     }
 
@@ -47,7 +49,8 @@ class Map extends Component {
             zoom: this.props.zoom,
             center: this.props.center,
             mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-            style: MapStyles
+            style: MapStyles,
+            venues: this.props.foundVenues
         };
 
         /* Instantiate the map object */
@@ -116,8 +119,8 @@ class Map extends Component {
     /* Show the corresponding infowindow */
     showInfoWindow = ( marker ) => {
         const infoContent = `<div id="info-window">
-                                <h3>${marker.title}</h3>
-                                <p>Description here</p>
+                                <h3>${marker.name}</h3>
+                                <p>${marker.position}</p>
                             </div>`;
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
@@ -126,7 +129,7 @@ class Map extends Component {
 
     render() {
         return (
-            <div id="map" />
+            <div id="map" role="application" />
         );
     }
 }
