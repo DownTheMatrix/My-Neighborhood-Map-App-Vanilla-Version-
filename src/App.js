@@ -3,37 +3,73 @@ import React, { Component } from "react";
 import './App.css';
 
 /* Main app components */
-import { StaticLocations } from "./data/StaticLocations";
+/* import { StaticLocations } from "./data/StaticLocations"; */
 import Header from "./components/Header";
 import Map from "./components/Map";
 import FilterLocations from "./components/FilterLocations";
-
-/* Import infowindows content */
-/* import { infoWindowContent, infoWindowError } from "./InfoWindows"; */
-
-/* Map custom sheet */
-import MapStyles from "./data/MapStyles.json";
 
 /* Import API info */
 import { CLIENT_ID, CLIENT_SECRET } from "./utils/FourSquareAPI";
 
 /* External libraries */
-import scriptLoader from 'react-async-script-loader';  // src: https://www.npmjs.com/package/react-async-script-loader 
 import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/package/escape-string-regexp
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
+import ReactDependentScript from "react-dependent-script";  // src: https://www.npmjs.com/package/react-dependent-script
 
 /* Define global variables */
 let map;  // Define map variable to use in the initMap() function
 
-/* Create markers for the static locations */
-let markers = [];
-
-/* Create infowindows */
-let infowindows = [];
+/* SO proposal... */
+const data = [{
+  locationCoords: {
+    lat: 45.42422,
+    lng: 10.991686
+  },
+  locationName: "Mizuki Lounge Restaurant",
+  locationId: "5952389dccad6b171c8d3e58",
+  address: "",
+},
+{
+  locationCoords: {
+    lat: 45.448458542692556,
+    lng: 11.00220835305019
+  },
+  locationName: "TeodoricoRe Restaurant Bar Verona",
+  locationId: "4dcee64f45ddbe15f8956f72",
+  address: ""
+},
+{
+  locationCoords: {
+    lat: 45.438385,
+    lng: 10.991622
+  },
+  locationName: "Hotel Montemezzi Restaurant",
+  locationId: "59c1f834a2a6ce4762f1de1e",
+  address: ""
+},
+{
+  locationCoords: {
+    lat: 45.44499306798319,
+    lng: 10.998014420366752
+  },
+  locationName: "AMO Opera Restaurant",
+  locationId: "52630778498ef9cb50326fb7",
+  address: ""
+},
+{
+  locationCoords: {
+    lat: 45.44232305284876,
+    lng: 10.99606990814209
+  },
+  locationName: "Sun Restaurant",
+  locationId: "5590d1da498e4edbe573034b",
+  address: ""
+}
+];
 
 class App extends Component {
     state = {
-      locations: StaticLocations,
+      /* locations: StaticLocations, */
       map: {},
       filterQuery: "",
       filteredLocations: [],
@@ -42,7 +78,13 @@ class App extends Component {
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
+      selectedItem: null
     };
+
+    /* SO proposal... */
+    showInfo(e, selectedItem) {
+      this.setState({ "selectedItem": selectedItem });
+    }
 
   /* Account for auth failure */
   gm_authFailure = ( err ) => { 
@@ -50,111 +92,6 @@ class App extends Component {
     showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
     console.error("Sorry, the map can be used in development only", err)
   };
-  
-  /* Initialize map, src: https://developers.google.com/maps/documentation/javascript/markers && https://stackoverflow.com/questions/3059044/google-maps-js-api-v3-simple-multiple-marker-example */
-  initMap = () => {
-    const initialCenter = new window.google.maps.LatLng( 45.438384, 10.991622 );
-    const mapOptions = {
-      zoom: 14,
-      center:  initialCenter,
-      styles: MapStyles,
-      mapTypeId: window.google.maps.MapTypeId.ROADMAP
-    };
-
-    /* Create map */
-    map = new window.google.maps.Map(document.getElementById( "map" ), mapOptions);
-
-    /* Create infowindow */
-    const largeInfoWindow = new window.google.maps.InfoWindow({
-      maxWidth: 350
-    });
-
-    /* Create map boundaries */
-    const bounds = new window.google.maps.LatLngBounds();
-
-    const { locations } = this.state;  // Destructure for readability
-
-    /* Add a custom marker, credit: https://github.com/atmist/snazzy-info-window/blob/master/examples/complex-styles/scripts.js */
-    const markerIcon = {
-      path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-      fillColor: "#e25a00",
-      fillOpacity: 0.95,
-      scale: 2,
-      strokeColor: "#fff",
-      strokeWeight: 3,
-      anchor: new window.google.maps.Point(12, 24)
-  };
-
-    /* Loop through the locations array and create a marker for each coordinates */
-    for ( let i = 0; i < locations.length; i++ ) {
-      const position = locations[i].locationCoords;
-      const locationTitle = locations[i].locationName;
-
-      const newMarker = new window.google.maps.Marker({
-        map: map,
-        position: position,
-        title: locationTitle,
-        animation: window.google.maps.Animation.DROP,
-        icon: markerIcon,
-        id: i
-      });
-
-      /* Push the newly created markers to the markers array */
-      markers.push( newMarker );
-
-      /* testing........ */
-     /*  window.google.maps.event.addListener(newMarker, "click", (( marker, i ) => {
-        return () => {
-            largeInfoWindow.setContent( locations[i][0] );
-            largeInfoWindow.open( map, marker );
-        }
-      })( newMarker, i )); */
-
-      /* Listen for a click event to open the corresponding infowindow and animate the markers */
-      newMarker.addListener("click", () => {
-        this.animateMarkers( newMarker );
-        this.populateInfoWindow( newMarker, largeInfoWindow );
-      });
-
-      /* initialize the focusMarker function */
-      this.focusMarker( newMarker, largeInfoWindow );
-
-      /* Close infowindow when the map is clicked on */
-      this.onMapClicked ( largeInfoWindow );
-    
-      /* Extend the map boundaries to include the markers */
-      bounds.extend( markers[i].position );
-    }
-    // Extend the boundaries of the map for each marker
-    map.fitBounds (bounds );
-  }
-
-  /* Focus on specific marker */
-  focusMarker = ( marker, infowindow ) => {
-    const { locations } = this.state;
-    for ( let i = 0; i < locations.length; i++ ) {
-      const position = locations[i].locationCoords;
-      map.setCenter(new window.google.maps.LatLng( position.lat, position.lng ));
-    }
-    /* window.google.maps.event.trigger(markers[id], 'click'); */
-  }
-
-  /* Create infowindow content and link it to the corresponding marker */
-  populateInfoWindow = ( marker, infowindow ) => {
-    let infoWindowContent = `<div id="info-window">
-                                <h3>${marker.title}</h3>
-                                <img src="" alt="" >
-                                <p>Description here</p>
-                             </div>`;
-    if ( infowindow.marker !== marker ) {
-      infowindow.marker = marker;
-      infowindow.setContent( infoWindowContent );
-      infowindow.open( map, marker );
-    /*   infowindow.addListener( "closeclick", () => {
-      infowindow.setMarker( null );
-      }); */
-    }
-  }
 
   /* Animate markers on click */
   animateMarkers = ( marker ) => {
@@ -162,47 +99,6 @@ class App extends Component {
     setInterval( () => {
       marker.setAnimation( null );
     }, 1200 );
-  }
-
-  /* Display an error message if the map initialization function fails */
-  initError = ( err ) => {
-    console.log("Can't load the map properly. Error type: ", err);
-    this.setState({ mapInitialization: false });
-  }
-
-  /* Lazy loading of the script needed for the scriptLoader decorator, src: https://www.npmjs.com/package/react-async-script-loader  */
-  componentWillReceiveProps = ({ isScriptLoaded, isScriptLoadSucceed }) => {
-    if ( isScriptLoaded && !this.props.isScriptLoaded ) { // load finished
-      if ( isScriptLoadSucceed ) {
-        this.initMap();
-        console.log(markers);
-      } else {
-        this.initError();
-      }
-    }
-  }
-
-  /* Retrieve the static locations info from the StaticLocations file and render the markers on the map */
-/*   renderMarkers () {  // src: https://developers.google.com/maps/documentation/javascript/markers
-    const { locations } = this.state;
-    locations.map(( location ) => {
-      const marker = new window.google.maps.Marker({
-        position: { lat: location.locationCoords.lat, lng: location.locationCoords.lng },
-        map: map,
-        title: location.locationName,
-        animation: window.google.maps.Animation.DROP
-      });
-    });
-  } */
-
-  /* Create the markers infowindows, src: https://developers.google.com/maps/documentation/javascript/infowindows */
-  createInfoWindow( marker, infoWindow ) {
-    
-  }
-
-  /* Called immediately after the component has been updated */
-  componentDidUpdate = () => {
-    
   }
 
   /* Src: https://www.npmjs.com/package/react-async-script-loader */
@@ -279,7 +175,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, foundVenues, locations } = this.state;
+    const { hamburgerToggled } = this.state;
 
     return (
 
@@ -304,27 +200,26 @@ class App extends Component {
                 onSearch = { this.searchVenues } 
                 onChange = { this.handleInputChange } />
 
-              <ul id="list-aside">
-                { locations.map(( location, index ) => {
-                  return (
-                  <li 
-                    role = "button"
-                    key = { index }
-                    onClick = { this.focusMarker.bind(this) }
-                    >{ location.locationName }</li>
-                  );
+
+            
+                <ul id="list-aside">
+
+                {data.map((item, index) => {
+                  return <li 
+                  key = { index } 
+                  onClick = { e => this.showInfo( e, item )} > {item.locationName }</li>;
                 })};
-              </ul>
-            </div>
-          </aside>
+
+                </ul>
+              </div>
+            </aside>
        
-        {/* Map component */}
-        <section className="map-container">
-          <Map 
-            google = { this.props.google } 
-            className = { "map-component" }
-            role = "application" 
-           />
+          {/* Map component */}
+          <section className="map-container">
+          <ReactDependentScript scripts={['https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places']}>
+            <Map center={{ lat: 45.438384, lng: 10.991622 }} zoom={14} data={data} selectedItem={this.state.selectedItem} />
+          </ReactDependentScript>
+    
         </section>
         
         </main>
@@ -334,6 +229,4 @@ class App extends Component {
   }
 }
 
-export default scriptLoader(
-  [`https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places`]
-)(App);
+export default App;

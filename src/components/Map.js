@@ -1,11 +1,123 @@
-import React from "react";
+/* Import main components */
+import React, { Component } from 'react';
 
-function Map (props) {
-   
-    return (
-        <div id="map"></div>
-    );
+/* Map custom sheet */
+import MapStyles from "../data/MapStyles.json";
+
+/* Define global variables */
+let map;
+
+class Map extends Component {
+    constructor(props) {
+        super(props)
+        this.markers = [];
+        this.infoWindow = null;
+    }
+
+    /* Display an error message if the map initialization function fails */
+    initError = ( err ) => {
+        console.log("Can't load the map properly. Error type: ", err);
+    }
+
+    /* Called after the update occurs
+     */
+    componentDidUpdate() {
+        if ( this.props.selectedItem ) {
+            let selectedMarker = this.markers.find( m => {
+                return m.id === this.props.selectedItem.locationId;
+            });
+        this.showInfoWindow( selectedMarker );
+        } 
+    }
+
+    /* Called after a component is mounted */
+    componentDidMount() {
+        this.initMap();
+    }
+
+    /* Initialize map objects */
+    initMap() {
+        let mapOptions = {
+            zoom: this.props.zoom,
+            center: this.props.center,
+            mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+            style: MapStyles
+        };
+
+        /* Instantiate the map object */
+        map = new window.google.maps.Map(document.getElementById("map"), mapOptions);
+        
+        /* Instantiate the infowindow object */
+        this.infoWindow = new window.google.maps.InfoWindow({});
+
+        /* Instantiate the map boundaries object */
+        let bounds = new window.google.maps.LatLngBounds();
+
+        /* Add a custom marker, credit: https://github.com/atmist/snazzy-info-window/blob/master/examples/complex-styles/scripts.js */
+        const markerIcon = {
+            path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+            fillColor: "#e25a00",
+            fillOpacity: 0.95,
+            scale: 2,
+            strokeColor: "#fff",
+            strokeWeight: 3,
+            anchor: new window.google.maps.Point(12, 24)
+        };
+  
+        /* Loop through the locations data and create a marker for each location */
+        this.props.data.forEach( item => {
+            const marker = new window.google.maps.Marker({
+                map: map,
+                id: item.locationId,
+                position: item.locationCoords,
+                title: item.locationName,
+                icon: markerIcon,
+                animation: window.google.maps.Animation.DROP,
+            });
+
+            /* Listen to click events on the markers */
+            marker.addListener( "click", () => {
+                this.showInfoWindow( marker );
+                this.animateMarkers( marker );
+            });
+
+            /* Get markers position on the map and push the newly created markers to the markers array */
+            bounds.extend( marker.getPosition() );
+            this.markers.push( marker );
+
+        /* Interact when the map is clicked on */
+        this.onMapClicked( this.infoWindow );
+
+        });
+        map.fitBounds( bounds );
+    }
+
+    /* Listen to click events on the map */
+    onMapClicked = ( infowindow ) => {
+        window.google.maps.event.addListener( map, "click", () => {
+            infowindow.close();
+        });
+    }
+
+    /* Animate markers on click */
+    animateMarkers = ( marker ) => {
+        marker.setAnimation( window.google.maps.Animation.BOUNCE );
+        setInterval( () => {
+        marker.setAnimation( null );
+        }, 1200 );
+    }
+
+    /* Show the corresponding infowindow */
+    showInfoWindow( marker ) {
+        this.infoWindow.setContent( marker.title );
+        this.infoWindow.open( marker.map, marker );
+    }
+
+    render() {
+        return (
+            <div id="map" />
+        );
+    }
 }
-
 
 export default Map;
