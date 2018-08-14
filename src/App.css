@@ -50,14 +50,12 @@ html, body {
   width: 100%;
 }
 
-/* Main */
 .main-map {
   height: 100vh;
   display: flex;
   flex-direction: row;
 }
 
-/* Map container */
 .map-container {
   height: 100%;
   width: 100%;
@@ -130,6 +128,11 @@ li:active, li:focus {
 /* Map objects style */
 #info-window {
   text-align: center;
+}
+
+.info-img {
+  width: 50%;
+  height: 50%;
 }
 
 /* Media queries */
