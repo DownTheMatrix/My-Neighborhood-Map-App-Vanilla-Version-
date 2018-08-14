@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import './App.css';
 
 /* Main app components */
-/* import { StaticLocations } from "./data/StaticLocations"; */
+import { StaticLocations } from "./data/StaticLocations";
 import Header from "./components/Header";
 import Map from "./components/Map";
 import FilterLocations from "./components/FilterLocations";
@@ -16,61 +16,9 @@ import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 import ReactDependentScript from "react-dependent-script";  // src: https://www.npmjs.com/package/react-dependent-script
 
-/* Define global variables */
-let map;  // Define map variable to use in the initMap() function
-
-/* SO proposal... */
-const data = [{
-  locationCoords: {
-    lat: 45.42422,
-    lng: 10.991686
-  },
-  locationName: "Mizuki Lounge Restaurant",
-  locationId: "5952389dccad6b171c8d3e58",
-  address: "",
-},
-{
-  locationCoords: {
-    lat: 45.448458542692556,
-    lng: 11.00220835305019
-  },
-  locationName: "TeodoricoRe Restaurant Bar Verona",
-  locationId: "4dcee64f45ddbe15f8956f72",
-  address: ""
-},
-{
-  locationCoords: {
-    lat: 45.438385,
-    lng: 10.991622
-  },
-  locationName: "Hotel Montemezzi Restaurant",
-  locationId: "59c1f834a2a6ce4762f1de1e",
-  address: ""
-},
-{
-  locationCoords: {
-    lat: 45.44499306798319,
-    lng: 10.998014420366752
-  },
-  locationName: "AMO Opera Restaurant",
-  locationId: "52630778498ef9cb50326fb7",
-  address: ""
-},
-{
-  locationCoords: {
-    lat: 45.44232305284876,
-    lng: 10.99606990814209
-  },
-  locationName: "Sun Restaurant",
-  locationId: "5590d1da498e4edbe573034b",
-  address: ""
-}
-];
-
 class App extends Component {
     state = {
-      /* locations: StaticLocations, */
-      map: {},
+      locations: StaticLocations,
       filterQuery: "",
       filteredLocations: [],
       mapInitialization: true,
@@ -85,21 +33,6 @@ class App extends Component {
     showInfo(e, selectedItem) {
       this.setState({ "selectedItem": selectedItem });
     }
-
-  /* Account for auth failure */
-  gm_authFailure = ( err ) => { 
-    const showError = document.querySelector("#display-error-field");
-    showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
-    console.error("Sorry, the map can be used in development only", err)
-  };
-
-  /* Animate markers on click */
-  animateMarkers = ( marker ) => {
-    marker.setAnimation( window.google.maps.Animation.BOUNCE );
-    setInterval( () => {
-      marker.setAnimation( null );
-    }, 1200 );
-  }
 
   /* Src: https://www.npmjs.com/package/react-async-script-loader */
   componentDidMount = () => {
@@ -117,13 +50,6 @@ class App extends Component {
     } else {
       this.setState({ hamburgerToggled: true });
     }
-  }
-
-  /* Listen to click events on the map */
-  onMapClicked = ( infowindow ) => {
-    window.google.maps.event.addListener( map, "click", () => {
-      infowindow.close();
-    });
   }
 
   /* handleInputChange function for filtering */
@@ -175,7 +101,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled } = this.state;
+    const { hamburgerToggled, locations } = this.state;
 
     return (
 
@@ -200,27 +126,25 @@ class App extends Component {
                 onSearch = { this.searchVenues } 
                 onChange = { this.handleInputChange } />
 
-
-            
                 <ul id="list-aside">
-
-                {data.map((item, index) => {
-                  return <li 
-                  key = { index } 
-                  onClick = { e => this.showInfo( e, item )} > {item.locationName }</li>;
-                })};
-
+                  {locations.map(( item, index ) => {
+                    return (
+                    <li 
+                      key = { index } 
+                      onClick = { e => this.showInfo( e, item )}>{item.locationName }
+                    </li>
+                    );
+                  })};
                 </ul>
-              </div>
-            </aside>
+            </div>
+          </aside>
        
           {/* Map component */}
           <section className="map-container">
-          <ReactDependentScript scripts={['https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places']}>
-            <Map center={{ lat: 45.438384, lng: 10.991622 }} zoom={14} data={data} selectedItem={this.state.selectedItem} />
-          </ReactDependentScript>
-    
-        </section>
+            <ReactDependentScript scripts = {['https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places']}>
+              <Map center = {{ lat: 45.438384, lng: 10.991622 }} zoom = { 14 } data = { locations } selectedItem = { this.state.selectedItem } />
+            </ReactDependentScript>
+          </section>
         
         </main>
       </div>
