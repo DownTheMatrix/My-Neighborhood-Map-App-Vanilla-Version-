@@ -119,12 +119,12 @@ class Map extends Component {
     showInfoWindow = ( marker ) => {
         const { foundVenues } = this.props;
         const match = foundVenues.filter( venue => venue.name === marker.title );
-        const address = `${match['0'].location.address ? match['0'].location.address : "No address found"}`;
+        const address = `${match['0'].location.address ? match['0'].location.address : "No address found"}`;  // credit: https://stackoverflow.com/questions/45676974/using-conditionals-inside-template-literals
         const infoContent = `<div id="info-window">
                                 <h3>${ marker.title }</h3>
-                                <img src="" alt="" />
-                                <p>${ address }</p>
-                            </div>`;
+                                <img class="info-img" src="" alt="" />
+                                <p>${ match['0'].location.address === undefined ? match['0'].location.formattedAddress : address }</p>
+                            </div>`;  // Display formatted address if normal address is not found
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
         this.animateMarkers( marker );
