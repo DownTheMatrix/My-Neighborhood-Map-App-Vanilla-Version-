@@ -12,16 +12,22 @@ class Map extends Component {
         super(props)
         this.markers = [];
         this.infoWindow = null;
-    }
+    };
+
+    /* Account for auth failure */
+    gm_authFailure = ( err ) => { 
+        const showError = document.querySelector("#display-error-field");
+        showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
+        console.error("Sorry, the map can be used in development only", err);
+    };
 
     /* Display an error message if the map initialization function fails */
     initError = ( err ) => {
         console.log("Can't load the map properly. Error type: ", err);
     }
 
-    /* Called after the update occurs
-     */
-    componentDidUpdate() {
+    /* Called after the update occurs */
+    componentDidUpdate = () => {
         if ( this.props.selectedItem ) {
             let selectedMarker = this.markers.find( m => {
                 return m.id === this.props.selectedItem.locationId;
@@ -31,12 +37,12 @@ class Map extends Component {
     }
 
     /* Called after a component is mounted */
-    componentDidMount() {
+    componentDidMount = () => {
         this.initMap();
     }
 
     /* Initialize map objects */
-    initMap() {
+    initMap = () => {
         let mapOptions = {
             zoom: this.props.zoom,
             center: this.props.center,
@@ -108,7 +114,7 @@ class Map extends Component {
     }
 
     /* Show the corresponding infowindow */
-    showInfoWindow( marker ) {
+    showInfoWindow = ( marker ) => {
         this.infoWindow.setContent( marker.title );
         this.infoWindow.open( marker.map, marker );
     }
