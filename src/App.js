@@ -136,13 +136,13 @@ class App extends Component {
               /> 
 
                 <ul id="list-aside">
-                  { foundVenues.map(( item, index ) => {
+                  { locations.map(( item, index ) => {
                     return (
                     <li 
                       tabIndex = "0"
                       role = "button"
                       key = { index } 
-                      onClick = { e => this.showInfo( e, item )}> { item.name }
+                      onClick = { e => this.showInfo( e, item )}> { item.locationName }
                     </li>
                     );
                   }) };
