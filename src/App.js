@@ -1,6 +1,6 @@
 /* Basic components */
 import React, { Component } from "react";
-import './App.css';
+import "./App.css";
 
 /* Main app components */
 import { StaticLocations } from "./data/StaticLocations";
@@ -28,12 +28,15 @@ class App extends Component {
     };
 
     /* Show infowindow */
-    showInfo = (e, selectedItem) => {
+    showInfo = ( e, selectedItem ) => {
       this.setState({ "selectedItem": selectedItem });
     }
 
   /* Src: https://www.npmjs.com/package/react-async-script-loader */
   componentDidMount = () => {
+    for (let i = 0; i < this.state.locations.length; i++) {
+      this.state.filteredLocations.push(this.state.locations[i].locationName);
+    }
     console.log("Component did mount!");
     if ( window.screen.width > 500 ) {  // Toggle automatically hamburger menu if screen size is greater than...
       this.setState({ hamburgerToggled: true }); 
@@ -52,10 +55,13 @@ class App extends Component {
 
   /* handleInputChange function for filtering */
   handleInputChange = (e) => {
+    let filteredList = this.state.filteredLocations.filter( (d) => {
+      return d.includes(e.target.value);
+    });
     this.setState({
-      filterQuery: e.target.value,
-    })
-    console.log(this.state.filterQuery)
+      filteredLocations: filteredList
+    });
+    console.log(this.state.filterQuery);
   }
 
    /* Search for specific places */
@@ -64,10 +70,11 @@ class App extends Component {
     const { venuesList } = this.state;
     if ( filterQuery ) {
       const match = new RegExp(escapeRegExp( filterQuery ), 'i');  // src: Udacity "React Contacts List" mini-course
-      return foundVenues = venuesList.filter(( venue ) => { match.test( venue.name )});
+      foundVenues = venuesList.filter(( venue ) => { match.test( venue.name )});
     } else {
-      return foundVenues = venuesList;
+      foundVenues = venuesList;
     }
+    this.setState({ foundVenues, filterQuery }, () =>  alert("update state!") );
   }
 
   /* Fetch venues from FourSquare */
@@ -99,7 +106,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, locations, foundVenues } = this.state;
+    const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
 
     return (
 
@@ -124,17 +131,18 @@ class App extends Component {
               <FilterLocations 
                 onSearch = { this.searchVenues } 
                 onChange = { this.handleInputChange } 
-                searchQuery = { this.state.filterQuery }
-              />
+                searchQuery = { filterQuery }
+                venues = { foundVenues }
+              /> 
 
                 <ul id="list-aside">
-                  { locations.map(( item, index ) => {
+                  { foundVenues.map(( item, index ) => {
                     return (
                     <li 
                       tabIndex = "0"
                       role = "button"
                       key = { index } 
-                      onClick = { e => this.showInfo( e, item )}> { item.locationName }
+                      onClick = { e => this.showInfo( e, item )}> { item.name }
                     </li>
                     );
                   }) };
@@ -149,7 +157,7 @@ class App extends Component {
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
                 zoom = { 14 } 
                 data = { locations } 
-                selectedItem = { this.state.selectedItem } 
+                selectedItem = { selectedItem } 
                 foundVenues = { foundVenues }
               />
             </ReactDependentScript>
