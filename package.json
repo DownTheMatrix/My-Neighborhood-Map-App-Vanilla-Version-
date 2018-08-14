@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^1.4.3",
     "escape-string-regexp": "^1.0.5",
+    "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-async-script-loader": "^0.3.0",
+    "react-dependent-script": "^1.1.0",
     "react-dom": "^16.4.2",
     "react-scripts": "1.1.4",
     "sort-by": "^1.2.0"
