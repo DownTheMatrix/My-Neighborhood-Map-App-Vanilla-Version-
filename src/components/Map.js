@@ -115,8 +115,13 @@ class Map extends Component {
 
     /* Show the corresponding infowindow */
     showInfoWindow = ( marker ) => {
-        this.infoWindow.setContent( marker.title );
+        const infoContent = `<div id="info-window">
+                                <h3>${marker.title}</h3>
+                                <p>Description here</p>
+                            </div>`;
+        this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
+        this.animateMarkers( marker );
     }
 
     render() {
