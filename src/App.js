@@ -85,7 +85,7 @@ class App extends Component {
     .then( data => {
       const venuesList = data.response.venues;
       if ( venuesList.length === 0 ) {  // Check if the data returned some results
-        window.alert("Error! No available places. Try to refresh the page!");  // To delete after refactor
+        alert("Error! No available places. Try to refresh the page!");  // To delete after refactor
       }
       venuesList.sort( sortBy( "name" ) );  // Use "sort-by" package functionality to arrange venues alphabetically
       const foundVenues = venuesList;
