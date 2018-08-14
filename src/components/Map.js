@@ -50,7 +50,6 @@ class Map extends Component {
             center: this.props.center,
             mapTypeId: window.google.maps.MapTypeId.ROADMAP,
             style: MapStyles,
-            venues: this.props.foundVenues
         };
 
         /* Instantiate the map object */
@@ -119,8 +118,8 @@ class Map extends Component {
     /* Show the corresponding infowindow */
     showInfoWindow = ( marker ) => {
         const infoContent = `<div id="info-window">
-                                <h3>${marker.name}</h3>
-                                <p>${marker.position}</p>
+                                <h3>${marker.title}</h3>
+                                <p>Description</p>
                             </div>`;
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
