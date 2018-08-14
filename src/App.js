@@ -21,16 +21,14 @@ class App extends Component {
       locations: StaticLocations,
       filterQuery: "",
       filteredLocations: [],
-      mapInitialization: true,
-      infowindowOpen: false,
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
       selectedItem: null
     };
 
-    /* SO proposal... */
-    showInfo(e, selectedItem) {
+    /* Show infowindow */
+    showInfo = (e, selectedItem) => {
       this.setState({ "selectedItem": selectedItem });
     }
 
@@ -75,7 +73,7 @@ class App extends Component {
   /* Fetch venues from FourSquare */
    /* Fetch data from FourSquare API */
    fetchVenues = () => {
-    fetch(`https://api.foursquare.com/v2/venues/search?near=Verona&query=hotel&category=4bf58dd8d48988d12d941735&limit=5&radius=5000&intent=browse&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&v=20180101&locale=en`)
+    fetch(`https://api.foursquare.com/v2/venues/search?near=Verona&query=restaurant&category=4bf58dd8d48988d12d941735&limit=5&radius=5000&intent=browse&venuePhotos=1&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&v=20180101&locale=en`)
     .then ( res => res.json() )
     .then( data => {
       const venuesList = data.response.venues;
@@ -101,7 +99,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, locations } = this.state;
+    const { hamburgerToggled, locations, foundVenues } = this.state;
 
     return (
 
@@ -112,7 +110,8 @@ class App extends Component {
          
          {/* Header component */}
          <Header 
-          onClick = { this.toggleHamburgerMenu }/>
+            onClick = { this.toggleHamburgerMenu }
+          />
  
           <main className="main-map">
 
@@ -124,25 +123,35 @@ class App extends Component {
               {/* Input component */}
               <FilterLocations 
                 onSearch = { this.searchVenues } 
-                onChange = { this.handleInputChange } />
+                onChange = { this.handleInputChange } 
+                searchQuery = { this.state.filterQuery }
+              />
 
                 <ul id="list-aside">
-                  {locations.map(( item, index ) => {
+                  { locations.map(( item, index ) => {
                     return (
                     <li 
+                      tabIndex = "0"
+                      role = "button"
                       key = { index } 
-                      onClick = { e => this.showInfo( e, item )}>{item.locationName }
+                      onClick = { e => this.showInfo( e, item )}> { item.locationName }
                     </li>
                     );
-                  })};
+                  }) };
                 </ul>
             </div>
           </aside>
        
           {/* Map component */}
           <section className="map-container">
-            <ReactDependentScript scripts = {['https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places']}>
-              <Map center = {{ lat: 45.438384, lng: 10.991622 }} zoom = { 14 } data = { locations } selectedItem = { this.state.selectedItem } />
+            <ReactDependentScript scripts = {["https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places"]}>
+              <Map 
+                center = {{ lat: 45.438384, lng: 10.991622 }} 
+                zoom = { 14 } 
+                data = { locations } 
+                selectedItem = { this.state.selectedItem } 
+                foundVenues = { foundVenues }
+              />
             </ReactDependentScript>
           </section>
         
