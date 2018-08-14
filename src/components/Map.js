@@ -81,6 +81,7 @@ class Map extends Component {
                 title: item.locationName,
                 icon: markerIcon,
                 animation: window.google.maps.Animation.DROP,
+                photo: item.photo
             });
 
             /* Listen to click events on the markers */
@@ -118,12 +119,12 @@ class Map extends Component {
     /* Show the corresponding infowindow */
     showInfoWindow = ( marker ) => {
         const { foundVenues } = this.props;
-        const match = foundVenues.filter( venue => venue.name === marker.title );
-        const address = `${match['0'].location.address ? match['0'].location.address : "No address found"}`;  // credit: https://stackoverflow.com/questions/45676974/using-conditionals-inside-template-literals
+        const matchVenue = foundVenues.filter( venue => venue.name === marker.title );   
+        const address = `${ matchVenue['0'].location.address ? matchVenue['0'].location.address : "No address found" }`;  // credit: https://stackoverflow.com/questions/45676974/using-conditionals-inside-template-literals
         const infoContent = `<div id="info-window">
                                 <h3>${ marker.title }</h3>
-                                <img class="info-img" src="" alt="" />
-                                <p>${ match['0'].location.address === undefined ? match['0'].location.formattedAddress : address }</p>
+                                <img class="info-img" src="${ marker.photo }" alt="${ marker.title } photo" />
+                                <p>${ matchVenue['0'].location.address === undefined ? matchVenue['0'].location.formattedAddress : address }</p>
                             </div>`;  // Display formatted address if normal address is not found
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
