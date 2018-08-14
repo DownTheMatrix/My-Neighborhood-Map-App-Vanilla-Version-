@@ -56,7 +56,7 @@ class Map extends Component {
         map = new window.google.maps.Map(document.getElementById("map"), mapOptions);
         
         /* Instantiate the infowindow object */
-        this.infoWindow = new window.google.maps.InfoWindow({});
+        this.infoWindow = new window.google.maps.InfoWindow({ maxWidth: 350 });
 
         /* Instantiate the map boundaries object */
         let bounds = new window.google.maps.LatLngBounds();
@@ -119,10 +119,11 @@ class Map extends Component {
     showInfoWindow = ( marker ) => {
         const { foundVenues } = this.props;
         const match = foundVenues.filter( venue => venue.name === marker.title );
+        const address = `${match['0'].location.address ? match['0'].location.address : "No address found"}`;
         const infoContent = `<div id="info-window">
-                                <h3>${marker.title}</h3>
+                                <h3>${ marker.title }</h3>
                                 <img src="" alt="" />
-                                <p>${match[0].location.formattedAddress}</p>
+                                <p>${ address }</p>
                             </div>`;
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
