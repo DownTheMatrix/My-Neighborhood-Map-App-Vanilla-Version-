@@ -7,7 +7,7 @@ export const StaticLocations = [{
     },
     locationName: "Mizuki Lounge Restaurant",
     locationId: "5952389dccad6b171c8d3e58",
-    address: "",
+    photo: "https://media-cdn.tripadvisor.com/media/photo-s/11/84/af/46/photo2jpg.jpg",
   },
   {
     locationCoords: {
@@ -16,7 +16,7 @@ export const StaticLocations = [{
     },
     locationName: "TeodoricoRe Restaurant Bar Verona",
     locationId: "4dcee64f45ddbe15f8956f72",
-    address: ""
+    photo: "https://qul.imgix.net/e2763a04-3367-4b7b-81e6-ff84f577f838/231083_landscape.jpg",
   },
   {
     locationCoords: {
@@ -25,7 +25,7 @@ export const StaticLocations = [{
     },
     locationName: "Hotel Montemezzi Restaurant",
     locationId: "59c1f834a2a6ce4762f1de1e",
-    address: ""
+    photo: "https://static.dayuse.com/hotels/0-6122/797_533/3350fa098d565b5f07f70749d51c7e97-hotel-montemezzi.jpeg",
   },
   {
     locationCoords: {
@@ -34,7 +34,7 @@ export const StaticLocations = [{
     },
     locationName: "AMO Opera Restaurant",
     locationId: "52630778498ef9cb50326fb7",
-    address: ""
+    photo: "https://media-cdn.tripadvisor.com/media/photo-s/04/b8/56/71/a-m-o-opera-restaurant.jpg",
   },
   {
     locationCoords: {
@@ -43,6 +43,6 @@ export const StaticLocations = [{
     },
     locationName: "Sun Restaurant",
     locationId: "5590d1da498e4edbe573034b",
-    address: ""
+    photo: "https://media-cdn.tripadvisor.com/media/photo-s/08/20/49/d8/sun-restaurant.jpg",
   }
 ];
