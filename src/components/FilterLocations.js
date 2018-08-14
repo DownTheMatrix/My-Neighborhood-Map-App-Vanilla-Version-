@@ -1,6 +1,6 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import Input from "@material-ui/core/Input";  /* src: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/demos/text-fields/Inputs.js */
+import { withStyles } from "@material-ui/core/styles";  // Style wrapper
+import Input from "@material-ui/core/Input";  // src: https://github.com/mui-org/material-ui/blob/master/docs/src/pages/demos/text-fields/Inputs.js
 
 /* Input component style */
 const styles = theme => ({
