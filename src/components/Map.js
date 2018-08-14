@@ -117,9 +117,12 @@ class Map extends Component {
 
     /* Show the corresponding infowindow */
     showInfoWindow = ( marker ) => {
+        const { foundVenues } = this.props;
+        const match = foundVenues.filter( venue => venue.name === marker.title );
         const infoContent = `<div id="info-window">
                                 <h3>${marker.title}</h3>
-                                <p>Description</p>
+                                <img src="" alt="" />
+                                <p>${match[0].location.formattedAddress}</p>
                             </div>`;
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
