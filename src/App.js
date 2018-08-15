@@ -101,6 +101,7 @@ class App extends Component {
     /* Destructure state variables for readability */
     const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
 
+    /* Make a new container for the locations to filter */
     let showingLocations;
 
     if ( filterQuery ) {
