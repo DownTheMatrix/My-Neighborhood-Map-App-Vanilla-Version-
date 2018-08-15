@@ -22,13 +22,16 @@ function FilterLocations ( props ) {
 
     return (
         <div className = { classes.container }>
-            <form aria-label="search your location">
+            <form aria-label = "search your location">
                 <Input
+                    role = "search"
                     className = { classes.input }
                     type = "text"
+                    aria-labelledby = "Search for your venue"
                     placeholder = { "Search for your venue" }
                     inputProps = {{ "aria-label" : "Query" }}
-                    onChange = { props.onChange }
+                    value = { props.value }
+                    onChange = { ( e ) => props.onChange( e.target.value ) }
                 />
             </form>
         </div>
