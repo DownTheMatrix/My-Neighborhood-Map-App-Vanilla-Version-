@@ -20,23 +20,19 @@ class App extends Component {
     state = {
       locations: StaticLocations,
       filterQuery: "",
-      filteredLocations: [],
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
       selectedItem: null
     };
 
-    /* Show infowindow */
-    showInfo = ( e, selectedItem ) => {
-      this.setState({ "selectedItem": selectedItem });
-    }
+  /* Show infowindow */
+  showInfo = ( e, selectedItem ) => {
+    this.setState({ "selectedItem": selectedItem });
+  }
 
-  /* Src: https://www.npmjs.com/package/react-async-script-loader */
+  /* Called after the component has been mounted */
   componentDidMount = () => {
-    for (let i = 0; i < this.state.locations.length; i++) {
-      this.state.filteredLocations.push(this.state.locations[i].locationName);
-    }
     console.log("Component did mount!");
     if ( window.screen.width > 500 ) {  // Toggle automatically hamburger menu if screen size is greater than...
       this.setState({ hamburgerToggled: true }); 
@@ -44,8 +40,8 @@ class App extends Component {
     this.fetchVenues();   // API call to FourSquare
   }
 
-   /* Toggle the hamburger menu function */
-   toggleHamburgerMenu = () => {
+  /* Toggle the hamburger menu function */
+  toggleHamburgerMenu = () => {
     if ( this.state.hamburgerToggled ) {
       this.setState({ hamburgerToggled: false });
     } else {
@@ -53,19 +49,15 @@ class App extends Component {
     }
   }
 
-  /* handleInputChange function for filtering */
-  handleInputChange = (e) => {
-    let filteredList = this.state.filteredLocations.filter( (d) => {
-      return d.includes(e.target.value);
-    });
+  /* Update filterQuery value */
+  updateQuery = ( query ) => {
     this.setState({
-      filteredLocations: filteredList
+      filterQuery: query.trim()
     });
-    console.log(this.state.filterQuery);
   }
 
    /* Search for specific places */
-   searchVenues = ( filterQuery ) => {
+  searchVenues = ( filterQuery ) => {
     let foundVenues;
     const { venuesList } = this.state;
     if ( filterQuery ) {
@@ -74,27 +66,28 @@ class App extends Component {
     } else {
       foundVenues = venuesList;
     }
-    this.setState({ foundVenues, filterQuery }, () =>  alert("update state!") );
+    foundVenues.sort(sortBy( 'title' ));
   }
 
   /* Fetch venues from FourSquare */
    /* Fetch data from FourSquare API */
-   fetchVenues = () => {
+  fetchVenues = () => {
     fetch(`https://api.foursquare.com/v2/venues/search?near=Verona&query=restaurant&category=4bf58dd8d48988d12d941735&limit=5&radius=5000&intent=browse&venuePhotos=1&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&v=20180101&locale=en`)
     .then ( res => res.json() )
     .then( data => {
       const venuesList = data.response.venues;
       if ( venuesList.length === 0 ) {  // Check if the data returned some results
-        alert("Error! No available places. Try to refresh the page!");  // To delete after refactor
+        alert("Error! No available places. Try to refresh the page!");
       }
       venuesList.sort( sortBy( "name" ) );  // Use "sort-by" package functionality to arrange venues alphabetically
       const foundVenues = venuesList;
       this.setState({ 
-        venuesList: venuesList, 
+        venuesList: venuesList,  // Update the state with the newly fetched data
         foundVenues: foundVenues
       }) 
       console.log("VenuesList :", this.state.venuesList);
       console.log("FoundVenues :", this.state.foundVenues);
+      console.log("FilteredLocations: ", this.state.filteredLocations);
     })
     .catch( err => {  // Notify the user about the error type
       const showError = document.querySelector("#display-error-field");
@@ -107,6 +100,15 @@ class App extends Component {
 
     /* Destructure state variables for readability */
     const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
+
+    let showingLocations;
+
+    if ( filterQuery ) {
+      const match = new RegExp(escapeRegExp( filterQuery ), "i");
+      showingLocations = locations.filter(( location ) => match.test( location.locationName ));
+    } else {
+      showingLocations = locations;
+    }
 
     return (
 
@@ -129,29 +131,30 @@ class App extends Component {
 
               {/* Input component */}
               <FilterLocations 
-                onSearch = { this.searchVenues } 
-                onChange = { this.handleInputChange } 
-                searchQuery = { filterQuery }
-                venues = { foundVenues }
+                onSearch = { this.searchVenues }
+                onChange = { this.updateQuery } 
+                value = { filterQuery }
+                /* venues = { foundVenues } */
               /> 
 
-                <ul id="list-aside">
-                  { locations.map(( item, index ) => {
+                <ul id = "list-aside">
+                  { showingLocations.map(( item, index ) => {
                     return (
-                    <li 
-                      tabIndex = "0"
-                      role = "button"
-                      key = { index } 
-                      onClick = { e => this.showInfo( e, item )}> { item.locationName }
-                    </li>
-                    );
-                  }) };
-                </ul>
+                      <li 
+                        tabIndex = "0"
+                        role = "button"
+                        aria-label = { `Details for ${ item.locationName }` }
+                        key = { index } 
+                        onClick = { e => this.showInfo( e, item )}> { item.locationName }
+                      </li>
+                      );
+                    })};
+                </ul> 
             </div>
           </aside>
        
           {/* Map component */}
-          <section className="map-container">
+          <section className = "map-container" role = "application" tabIndex="-1">
             <ReactDependentScript scripts = {["https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places"]}>
               <Map 
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
