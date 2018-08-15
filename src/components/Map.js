@@ -56,7 +56,7 @@ class Map extends Component {
         map = new window.google.maps.Map(document.getElementById("map"), mapOptions);
         
         /* Instantiate the infowindow object */
-        this.infoWindow = new window.google.maps.InfoWindow({ maxWidth: 350 });
+        this.infoWindow = new window.google.maps.InfoWindow({ maxWidth: 200 });
 
         /* Instantiate the map boundaries object */
         let bounds = new window.google.maps.LatLngBounds();
@@ -120,11 +120,11 @@ class Map extends Component {
     showInfoWindow = ( marker ) => {
         const { foundVenues } = this.props;
         const matchVenue = foundVenues.filter( venue => venue.name === marker.title );   
-        const address = `${ matchVenue['0'].location.address ? matchVenue['0'].location.address : "No address found" }`;  // credit: https://stackoverflow.com/questions/45676974/using-conditionals-inside-template-literals
-        const infoContent = `<div id="info-window">
+        const address = `${ matchVenue[0].location.address ? matchVenue['0'].location.address : "No address found" }`;  // credit: https://stackoverflow.com/questions/45676974/using-conditionals-inside-template-literals
+        const infoContent = `<div id = "info-window">
                                 <h3>${ marker.title }</h3>
-                                <img class="info-img" src="${ marker.photo }" alt="${ marker.title } photo" />
-                                <p>${ matchVenue['0'].location.address === undefined ? matchVenue['0'].location.formattedAddress : address }</p>
+                                <img class = "info-img" src = "${ marker.photo }" alt = "${ marker.title } photo" />
+                                <p>${ matchVenue[0].location.address === undefined ? matchVenue[0].location.formattedAddress : address }</p>
                             </div>`;  // Display formatted address if normal address is not found
         this.infoWindow.setContent( infoContent );
         this.infoWindow.open( marker.map, marker );
@@ -133,7 +133,7 @@ class Map extends Component {
 
     render() {
         return (
-            <div id="map" role="application" />
+            <div id = "map" role = "region" aria-label = "Verona Restaurants Explorer" />
         );
     }
 }
