@@ -87,7 +87,6 @@ class App extends Component {
       }) 
       console.log("VenuesList :", this.state.venuesList);
       console.log("FoundVenues :", this.state.foundVenues);
-      console.log("FilteredLocations: ", this.state.filteredLocations);
     })
     .catch( err => {  // Notify the user about the error type
       const showError = document.querySelector("#display-error-field");
@@ -101,7 +100,7 @@ class App extends Component {
     /* Destructure state variables for readability */
     const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
 
-    /* Make a new container for the locations to filter */
+    /* Create a new array for the locations to filter, credit: "udacity-react-course: list-contacts project" */
     let showingLocations;
 
     if ( filterQuery ) {
@@ -132,7 +131,6 @@ class App extends Component {
 
               {/* Input component */}
               <FilterLocations 
-                onSearch = { this.searchVenues }
                 onChange = { this.updateQuery } 
                 value = { filterQuery }
                 /* venues = { foundVenues } */
