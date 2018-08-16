@@ -15,6 +15,7 @@ import { CLIENT_ID, CLIENT_SECRET } from "./utils/FourSquareAPI";
 import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/package/escape-string-regexp
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 import ReactDependentScript from "react-dependent-script";  // src: https://www.npmjs.com/package/react-dependent-script
+import PropTypes from "prop-types";
 
 class App extends Component {
     state = {
@@ -66,7 +67,10 @@ class App extends Component {
     } else {
       foundVenues = venuesList;
     }
-    foundVenues.sort(sortBy( 'title' ));
+    this.setState({
+      foundVenues: foundVenues,
+      filterQuery: filterQuery
+    });
   }
 
   /* Fetch venues from FourSquare */
@@ -110,6 +114,10 @@ class App extends Component {
       showingLocations = locations;
     }
 
+    if ( showingLocations.length === 0 ) {  // filter markers on user input...
+      
+    }
+
     return (
 
       <div id="app-container" role="main">
@@ -133,10 +141,10 @@ class App extends Component {
               <FilterLocations 
                 onChange = { this.updateQuery } 
                 value = { filterQuery }
-                /* venues = { foundVenues } */
+                onSearch = { this.searchVenues }  // To replace the onChange prop (in progress)
               /> 
 
-                <ul id = "list-aside">
+                <ul id = "list-aside" aria-labelledby = "Locations list" >
                   { showingLocations.map(( item, index ) => {
                     return (
                       <li 
@@ -167,7 +175,6 @@ class App extends Component {
         
         </main>
       </div>
-      
     );
   }
 }
