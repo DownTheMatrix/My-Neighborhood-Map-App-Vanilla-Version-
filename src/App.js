@@ -115,7 +115,9 @@ class App extends Component {
     }
 
     if ( showingLocations.length === 0 ) {  // filter markers on user input...
-      
+      this.setState({
+        showingLocations: locations
+      });
     }
 
     return (
