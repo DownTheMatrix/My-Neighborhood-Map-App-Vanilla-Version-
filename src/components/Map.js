@@ -4,6 +4,13 @@ import React, { Component } from 'react';
 /* Map custom sheet */
 import MapStyles from "../data/MapStyles.json";
 
+/* Account for auth failure */
+window.gm_authFailure = ( err ) => { 
+    const showError = document.querySelector("#display-error-field");
+    showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
+    console.error("Sorry, the map can be used in development only", err);
+};
+
 /* Define global variables */
 let map;
 
@@ -12,13 +19,6 @@ class Map extends Component {
         super( props )
         this.markers = [];
         this.infoWindow = null;
-    };
-
-    /* Account for auth failure */
-    gm_authFailure = ( err ) => { 
-        const showError = document.querySelector("#display-error-field");
-        showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
-        console.error("Sorry, the map can be used in development only", err);
     };
 
     /* Display an error message if the map initialization function fails */
