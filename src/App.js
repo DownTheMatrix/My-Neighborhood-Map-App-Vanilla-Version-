@@ -15,7 +15,6 @@ import { CLIENT_ID, CLIENT_SECRET } from "./utils/FourSquareAPI";
 import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/package/escape-string-regexp
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
 import ReactDependentScript from "react-dependent-script";  // src: https://www.npmjs.com/package/react-dependent-script
-import PropTypes from "prop-types";
 
 class App extends Component {
     state = {
@@ -68,13 +67,12 @@ class App extends Component {
       foundVenues = venuesList;
     }
     this.setState({
-      foundVenues: foundVenues,
-      filterQuery: filterQuery
+      foundVenues,
+      filterQuery
     });
   }
 
-  /* Fetch venues from FourSquare */
-   /* Fetch data from FourSquare API */
+  /* Fetch data from FourSquare API */
   fetchVenues = () => {
     fetch(`https://api.foursquare.com/v2/venues/search?near=Verona&query=restaurant&category=4bf58dd8d48988d12d941735&limit=5&radius=5000&intent=browse&venuePhotos=1&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&v=20180101&locale=en`)
     .then ( res => res.json() )
@@ -112,12 +110,6 @@ class App extends Component {
       showingLocations = locations.filter(( location ) => match.test( location.locationName ));
     } else {
       showingLocations = locations;
-    }
-
-    if ( showingLocations.length === 0 ) {  // filter markers on user input...
-      this.setState({
-        showingLocations: locations
-      });
     }
 
     return (
@@ -168,9 +160,10 @@ class App extends Component {
               <Map 
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
                 zoom = { 14 } 
-                data = { locations } 
+                data = { locations }  // Static locations
                 selectedItem = { selectedItem } 
-                foundVenues = { foundVenues }
+                onFilter = { this.updateQuery }
+                foundVenues = { foundVenues.length > 0 ? foundVenues : locations }  // Check if foundVenues is empty. If yes, assign the static locations instead (for future development purposes, as for now they coincide)
               />
             </ReactDependentScript>
           </section>

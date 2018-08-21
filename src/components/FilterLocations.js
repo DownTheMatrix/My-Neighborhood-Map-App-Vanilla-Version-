@@ -31,7 +31,7 @@ function FilterLocations ( props ) {
                     placeholder = { "Search for your venue" }
                     inputProps = {{ "aria-label" : "Query" }}
                     value = { props.value }
-                    onChange = { ( e ) => props.onChange( e.target.value ) }
+                    onChange = { ( e ) => props.onChange( e.target.value.toLocaleLowerCase() ) }
                 />
             </form>
         </div>

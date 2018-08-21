@@ -7,7 +7,7 @@ import MapStyles from "../data/MapStyles.json";
 /* Account for auth failure */
 window.gm_authFailure = ( err ) => { 
     const showError = document.querySelector("#display-error-field");
-    showError.innerHTML = "Sorry, looks like there's a problem with your authentification";
+    showError.innerHTML = "Sorry, looks like there's a problem with your authentification credentials";
     console.error("Sorry, the map can be used in development only", err);
 };
 
@@ -15,18 +15,11 @@ window.gm_authFailure = ( err ) => {
 let map;
 
 class Map extends Component {
-    constructor(props) {
+    constructor( props ) {
         super( props )
         this.markers = [];
         this.infoWindow = null;
     };
-
-    /* Display an error message if the map initialization function fails */
-    initError = ( err ) => {
-        const showError = document.querySelector("#display-error-field");
-        showError.innerHTML = "Can't load the map properly. Check the console for more details about the error.";
-        console.log("Can't load the map properly. Error type: ", err);
-    }
 
     /* Called after the update occurs */
     componentDidUpdate = () => {
@@ -43,13 +36,31 @@ class Map extends Component {
         this.initMap();
     }
 
+    /* TEST!!! */
+    markerFilter = () => {
+        const filteredMarkers = [];
+        if ( this.props.filterQuery ) {
+            this.infoWindow.close();
+            this.markers.forEach(( marker ) => {
+                if ( marker.title.toLowerCase().indexOf( this.props.filterQuery ) > -1 ) {
+                    marker.setVisible( true );
+                    filteredMarkers.push( marker );
+                } else {
+                    marker.setVisible( false );
+                }
+            });
+            filteredMarkers.sort(this.sortName);
+            this.markers.forEach(( marker ) => marker.setVisible(true) );
+        }
+    }
+
     /* Initialize map objects */
     initMap = () => {
         let mapOptions = {
             zoom: this.props.zoom,
             center: this.props.center,
             mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-            style: MapStyles,
+            style: MapStyles
         };
 
         /* Instantiate the map object */
@@ -73,7 +84,7 @@ class Map extends Component {
         };
   
         /* Loop through the locations data and create a marker for each location */
-        this.props.data.forEach( item => {
+        this.props.foundVenues.forEach( item => {
             const marker = new window.google.maps.Marker({
                 map: map,
                 id: item.locationId,
@@ -113,7 +124,7 @@ class Map extends Component {
         marker.setAnimation( window.google.maps.Animation.BOUNCE );
         setInterval( () => {
         marker.setAnimation( null );
-        }, 1200 );
+        }, 1200 );  // Toggle off the bounce animation after the set amount of time
     }
 
     /* Show the corresponding infowindow */
