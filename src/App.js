@@ -92,7 +92,8 @@ class App extends Component {
     })
     .catch( err => {  // Notify the user about the error type
       const showError = document.querySelector("#display-error-field");
-      showError.innerHTML = "Sorry, we couldn't retrieve data correctly. Try to reload the page.";
+      showError.style.display = "block";
+      showError.innerHTML = "Sorry, we couldn't retrieve data properly from FourSquare. Check your URL and try to reload the page.";
       console.error("Sorry, we couldn't retrieve data properly. An error occurred with the FourSquare API", err)
     })
   }
@@ -155,7 +156,7 @@ class App extends Component {
           </aside>
        
           {/* Map component */}
-          <section className = "map-container" role = "application" tabIndex="-1">
+          <section className = "map-container">
             <ReactDependentScript scripts = {["https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places"]}>
               <Map 
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
