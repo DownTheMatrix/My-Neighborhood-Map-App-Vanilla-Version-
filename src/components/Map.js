@@ -36,24 +36,6 @@ class Map extends Component {
         this.initMap();
     }
 
-    /* TEST!!! */
-    markerFilter = () => {
-        const filteredMarkers = [];
-        if ( this.props.filterQuery ) {
-            this.infoWindow.close();
-            this.markers.forEach(( marker ) => {
-                if ( marker.title.toLowerCase().indexOf( this.props.filterQuery ) > -1 ) {
-                    marker.setVisible( true );
-                    filteredMarkers.push( marker );
-                } else {
-                    marker.setVisible( false );
-                }
-            });
-            filteredMarkers.sort(this.sortName);
-            this.markers.forEach(( marker ) => marker.setVisible(true) );
-        }
-    }
-
     /* Initialize map objects */
     initMap = () => {
         let mapOptions = {
@@ -105,8 +87,8 @@ class Map extends Component {
             bounds.extend( marker.getPosition() );
             this.markers.push( marker );
 
-        /* Interact when the map is clicked on */
-        this.onMapClicked( this.infoWindow );
+            /* Interact when the map is clicked on */
+            this.onMapClicked( this.infoWindow );
 
         });
         map.fitBounds( bounds );

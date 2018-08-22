@@ -6,7 +6,8 @@ import Input from "@material-ui/core/Input";  // src: https://github.com/mui-org
 const styles = theme => ({
     container: {
       display: "flex",
-      flexWrap: "wrap"
+      flexWrap: "wrap",
+      padding: "0.8em"
     },
     input: {
       margin: theme.spacing.unit,
