@@ -7,7 +7,8 @@ import MapStyles from "../data/MapStyles.json";
 /* Account for auth failure */
 window.gm_authFailure = ( err ) => { 
     const showError = document.querySelector("#display-error-field");
-    showError.innerHTML = "Sorry, looks like there's a problem with your authentification credentials";
+    showError.style.display = "block";
+    showError.innerHTML = "Sorry, looks like there's a problem with your authentification. Check your API key and try again.";
     console.error("Sorry, the map can be used in development only", err);
 };
 
@@ -126,7 +127,7 @@ class Map extends Component {
 
     render() {
         return (
-            <div id = "map" role = "region" aria-label = "Verona Restaurants Explorer" />
+            <div tabIndex = "0" id = "map" role = "application" aria-label = "Verona Restaurants Explorer" />
         );
     }
 }
