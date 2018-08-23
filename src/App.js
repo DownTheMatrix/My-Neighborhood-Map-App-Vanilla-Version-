@@ -14,7 +14,6 @@ import { CLIENT_ID, CLIENT_SECRET } from "./utils/FourSquareAPI";
 /* External libraries */
 import escapeRegExp from 'escape-string-regexp';  // src: https://www.npmjs.com/package/escape-string-regexp
 import sortBy from 'sort-by';  // src: https://www.npmjs.com/package/sort-by
-import ReactDependentScript from "react-dependent-script";  // src: https://www.npmjs.com/package/react-dependent-script
 
 class App extends Component {
     state = {
@@ -23,8 +22,13 @@ class App extends Component {
       venuesList: [],
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
-      selectedItem: null
+      selectedItem: null,
+      googleError: false
     };
+
+  componentWillMount = () => {
+    this.setState({ googleError: window.googleError || !navigator.onLine });
+  }
 
   /* Show infowindow */
   showInfo = ( e, selectedItem ) => {
@@ -56,7 +60,7 @@ class App extends Component {
     });
   }
 
-   /* Search for specific places */
+  /* Search for specific places */
   searchVenues = ( filterQuery ) => {
     let foundVenues;
     const { venuesList } = this.state;
@@ -101,7 +105,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
+    const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery, googleError } = this.state;
 
     /* Create a new array for the locations to filter, credit: "udacity-react-course: list-contacts project" */
     let showingLocations;
@@ -157,7 +161,8 @@ class App extends Component {
        
           {/* Map component */}
           <section className = "map-container">
-            <ReactDependentScript scripts = {["https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places"]}>
+          {/* Conditional rendering of the Map component */}
+          { !googleError && 
               <Map 
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
                 zoom = { 14 } 
@@ -165,8 +170,10 @@ class App extends Component {
                 selectedItem = { selectedItem } 
                 onFilter = { this.updateQuery }
                 foundVenues = { foundVenues.length > 0 ? foundVenues : locations }  // Check if foundVenues is empty. If yes, assign the static locations instead (for future development purposes, as for now they coincide)
-              />
-            </ReactDependentScript>
+              /> }
+              { googleError && (
+                  <p>Sorry, the map couldn't load properly. Check your browser console for more details and try again.</p>
+              ) }
           </section>
         
         </main>
