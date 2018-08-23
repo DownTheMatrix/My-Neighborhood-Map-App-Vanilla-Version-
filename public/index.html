@@ -6,7 +6,23 @@
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <title>My Neighborhood Effort</title>
+    <title>My Neighborhood Map App</title>
+    <script>
+      /* Google Maps API error handling */
+      window.googleError = false;
+      function googleError() {
+        window.googleError = true;
+      }
+      /* Account for authentification (credentials) issues with the Google Maps API */
+      function gm_authFailure( err ) {
+        window.googleError = true;
+        const showError = document.querySelector("#display-error-field");
+        showError.style.display = "block";
+        showError.innerHTML = "Sorry, looks like there's a problem with your authentification. Check your API key and try again.";
+        console.error("Sorry, the map can be used in development only", err);
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfnJ5zhWZyh1ZJDrpsKJFzpDfaDDgJfiM&v=3.exp&libraries=geometry,drawing,places" onerror="googleError()"></script>
   </head>
   <body>
 
