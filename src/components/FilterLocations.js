@@ -13,7 +13,7 @@ const styles = theme => ({
       margin: theme.spacing.unit,
       color: "#fff",
       borderBottom: "1px solid #000",
-      width: "100%"
+      width: "80%"
     },
   });
 
