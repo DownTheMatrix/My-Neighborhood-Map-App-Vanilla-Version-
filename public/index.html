@@ -9,13 +9,13 @@
     <title>My Neighborhood Map App</title>
     <script>
       /* Google Maps API error handling */
-      window.googleError = false;
+      window.mapApiError = false;
       function googleError() {
-        window.googleError = true;
+        window.mapApiError = true;
       }
       /* Account for authentification (credentials) issues with the Google Maps API */
       function gm_authFailure( err ) {
-        window.googleError = true;
+        window.mapApiError = true;
         const showError = document.querySelector("#display-error-field");
         showError.style.display = "block";
         showError.innerHTML = "Sorry, looks like there's a problem with your authentification. Check your API key and try again.";
