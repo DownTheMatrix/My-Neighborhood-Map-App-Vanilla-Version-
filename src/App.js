@@ -23,11 +23,11 @@ class App extends Component {
       foundVenues: [],
       hamburgerToggled: false,  // Set initial hamburger menu state
       selectedItem: null,
-      googleError: false
+      mapApiError: false
     };
-
+  
   componentWillMount = () => {
-    this.setState({ googleError: window.googleError || !navigator.onLine });
+    this.setState({ mapApiError: window.mapApiError || !navigator.onLine });
   }
 
   /* Show infowindow */
@@ -42,6 +42,8 @@ class App extends Component {
       this.setState({ hamburgerToggled: true }); 
     }
     this.fetchVenues();   // API call to FourSquare
+    this.setState({ mapApiError: window.mapApiError || !navigator.onLine });
+    console.log( this.state.mapApiError );  // log to the console for testing...
   }
 
   /* Toggle the hamburger menu function */
@@ -105,7 +107,7 @@ class App extends Component {
   render() {
 
     /* Destructure state variables for readability */
-    const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery, googleError } = this.state;
+    const { hamburgerToggled, locations, foundVenues, selectedItem, filterQuery } = this.state;
 
     /* Create a new array for the locations to filter, credit: "udacity-react-course: list-contacts project" */
     let showingLocations;
@@ -162,7 +164,7 @@ class App extends Component {
           {/* Map component */}
           <section className = "map-container">
           {/* Conditional rendering of the Map component */}
-          { !googleError && 
+          { !this.state.mapApiError && 
               <Map 
                 center = {{ lat: 45.438384, lng: 10.991622 }} 
                 zoom = { 14 } 
@@ -171,8 +173,10 @@ class App extends Component {
                 onFilter = { this.updateQuery }
                 foundVenues = { foundVenues.length > 0 ? foundVenues : locations }  // Check if foundVenues is empty. If yes, assign the static locations instead (for future development purposes, as for now they coincide)
               /> }
-              { googleError && (
+              { this.state.mapApiError && (
+                <div id="error-message">
                   <p>Sorry, the map couldn't load properly. Check your browser console for more details and try again.</p>
+                </div>
               ) }
           </section>
         
