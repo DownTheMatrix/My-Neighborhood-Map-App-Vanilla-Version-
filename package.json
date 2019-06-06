@@ -6,6 +6,8 @@
     "@material-ui/core": "^1.4.3",
     "escape-string-regexp": "^1.0.5",
     "handlebars": "^4.1.2",
+    "js-yaml": "^3.13.1",
+    "lodash": "^4.17.11",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-async-script-loader": "^0.3.0",
