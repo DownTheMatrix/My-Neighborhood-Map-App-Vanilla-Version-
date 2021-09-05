@@ -19,7 +19,7 @@
     "mixin-deep": "^2.0.1",
     "node-fetch": "^2.6.1",
     "node-forge": "^0.10.0",
-    "object-path": "^0.11.5",
+    "object-path": "^0.11.6",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-async-script-loader": "^0.3.0",
